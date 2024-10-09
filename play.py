@@ -16,14 +16,26 @@ from turns import DOMINO_POOL, draw_initial_hand, take_turn_with_basic_strategy,
 def play_game(player_strategies, train_start_number):
     hands = [] # hands ordered by players
     num_players = len(player_strategies)
+    winner = None
     if num_players != 4:
-        raise(ValueError, "Play only implemented for 4 players currently")
-    else:
+        raise(ValueError, "Play currently only implemented for 4 players")
+    if any([strategy != "basic" for strategy in player_strategies]):
+        raise(ValueError, "Play currently only implemented for basic strategy")
         # draw initial hand randomly, then organize based on simple strategy
+    for player in range(num_players):
+        # player_strategy = player_strategies[player]
+        player_hand = draw_initial_hand(num_players)
+        player_hand = organize_initial_hand_simple_strategy(player_hand, train_start_number)
+        hands.append(player_hand)
+    # as long as no game ending condition is met, players take turns in order
+    while len(DOMINO_POOL) and (winner is None):
         for player in range(num_players):
-            player_strategy = player_strategies[player]
-            player_hand = draw_initial_hand(num_players)
-            player_hand = organize_initial_hand_simple_strategy(player_hand, train_start_number)
-            hands.append(player_hand)
+            player_hand = hands[player]
+            player_updated_hand = take_turn_with_basic_strategy(player, player_hand, train_start_number)
+            if not any([len(player_updated_hand[key]) > 0 for key in player_updated_hand.keys()]):
+                winner = player
+    return winner
 
-    return
+
+if __name__ == "__main__":
+    player_strategies = ["basic", "basic", "basic", "basic"]

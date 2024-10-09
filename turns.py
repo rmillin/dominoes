@@ -155,22 +155,22 @@ def break_double(player_id, current_hand, double):
         if is_private:
             if len(matching["private"]) and (0 in matching["private"]):
                 # use this domino and remove it from updated_hand
-                TRAINS[double]["contents"].append(current_hand["private"][0])
+                TRAINS[double]["contents"].append(correct_domino_order(current_hand["private"][0], number_to_match))
                 updated_hand["private"].pop(0)
             elif len(matching["public"]):
                 # select a domino randomly from the public hand
                 to_use = random.choice(matching["public"])
-                TRAINS[double]["contents"].append(current_hand["public"][to_use])
+                TRAINS[double]["contents"].append(correct_domino_order(current_hand["public"][to_use], number_to_match))
                 updated_hand["public"].pop(to_use)
             elif len(matching["new"]):
                 # select a domino randomly from the new train hand
                 to_use = random.choice(matching["new"])
-                TRAINS[double]["contents"].append(current_hand["new"][to_use])
+                TRAINS[double]["contents"].append(correct_domino_order(current_hand["new"][to_use], number_to_match))
                 updated_hand["new"].pop(to_use)
             else: 
                 # the remaining case is that the domino is in "private" but not next in the train
                 to_use = random.choice(matching["private"])
-                TRAINS[double]["contents"].append(current_hand["private"][to_use])
+                TRAINS[double]["contents"].append(correct_domino_order(current_hand["private"][to_use], number_to_match))
                 updated_hand["private"].pop(to_use)
         else:
             # in this case, prefer to use from the public hand, then the new hand, then the 
@@ -178,16 +178,16 @@ def break_double(player_id, current_hand, double):
             if len(matching["public"]):
                 # select a domino randomly from the public hand
                 to_use = random.choice(matching["public"])
-                TRAINS[double]["contents"].append(current_hand["public"][to_use])
+                TRAINS[double]["contents"].append(correct_domino_order(current_hand["public"][to_use], number_to_match))
                 updated_hand["public"].pop(to_use)
             elif len(matching["new"]):
                 # select a domino randomly from the new train hand
                 to_use = random.choice(matching["new"])
-                TRAINS[double]["contents"].append(current_hand["new"][to_use])
+                TRAINS[double]["contents"].append(correct_domino_order(current_hand["new"][to_use], number_to_match))
                 updated_hand["new"].pop(to_use)
             else:
                 to_use = matching["private"][-1]
-                TRAINS[double]["contents"].append(current_hand["private"][to_use])
+                TRAINS[double]["contents"].append(correct_domino_order(current_hand["private"][to_use], number_to_match))
                 updated_hand["private"].pop(to_use)
 
 
@@ -200,7 +200,7 @@ def break_double(player_id, current_hand, double):
         DOMINO_POOL.remove(drawn)
         # if this matches the double, use it; if not, add it to hand
         if number_to_match in drawn:
-            TRAINS[double]["contents"].append(drawn)
+            TRAINS[double]["contents"].append(correct_domino_order(drawn, number_to_match))
             make_train_private(player_id)
         else:
             # add to hand
@@ -258,7 +258,7 @@ def make_move_with_basic_strategy(player_id, current_hand, train_start_number):
             if len(matching["public"]):
                 found_move = True
                 to_use = random.choice(matching["public"])
-                TRAINS[public_train_ind]["contents"].append(matching["public"][to_use])
+                TRAINS[public_train_ind]["contents"].append(correct_domino_order(matching["public"][to_use], number_to_match))
                 updated_hand["public"].pop(to_use)
                 break
         if not found_move:
@@ -268,60 +268,47 @@ def make_move_with_basic_strategy(player_id, current_hand, train_start_number):
                 if len(matching["new"]):
                     found_move = True
                     to_use = random.choice(matching["new"])
-                    TRAINS[public_train_ind]["contents"].append(matching["new"][to_use])
+                    TRAINS[public_train_ind]["contents"].append(correct_domino_order(matching["new"][to_use], number_to_match))
                     updated_hand["new"].pop(to_use)
                     break
     if not found_move:
         if not private_train_exists:
             matching = find_matching_domino_inds(current_hand, train_start_number)
-            # try to start from any pool in the hand
+            # try to start a new train from any pool in the hand
             for key in matching.keys():
                 if len(matching[key]):
                     to_use = random.choice(matching[key])
                     found_move = True
-                    TRAINS[private_train_ind]["contents"].append(matching[key][to_use])
+                    TRAINS[private_train_ind]["contents"].append(correct_domino_order(matching[key][to_use], train_start_number))
                     updated_hand[key].pop(to_use)
                     break
-
-
         else:
-            number_to_match = TRAINS[public_train_ind]["contents"][-1][1]
+            number_to_match = TRAINS[private_train_ind]["contents"][-1][1]
             matching = find_matching_domino_inds(current_hand, number_to_match)
+            # if a match is found anywhere, a move can be made
             if any([len(matching[key]) for key in matching.keys()]):
                 found_move = True
             if len(matching["private"]) and (0 in matching["private"]):
                 # use this domino and remove it from updated_hand
-                TRAINS[public_train_ind]["contents"].append(current_hand["private"][0])
+                TRAINS[public_train_ind]["contents"].append(correct_domino_order(current_hand["private"][0], number_to_match))
                 updated_hand["private"].pop(0)
             elif len(matching["public"]):
                 # select a domino randomly from the public hand
                 to_use = random.choice(matching["public"])
-                TRAINS[public_train_ind]["contents"].append(current_hand["public"][to_use])
+                TRAINS[public_train_ind]["contents"].append(correct_domino_order(current_hand["public"][to_use], number_to_match))
                 updated_hand["public"].pop(to_use)
             elif len(matching["new"]):
                 # select a domino randomly from the new train hand
                 to_use = random.choice(matching["new"])
-                TRAINS[public_train_ind]["contents"].append(current_hand["new"][to_use])
+                TRAINS[public_train_ind]["contents"].append(correct_domino_order(current_hand["new"][to_use], number_to_match))
                 updated_hand["new"].pop(to_use)
             else: 
                 # the remaining case is that the domino is in "private" but not next in the train
                 to_use = random.choice(matching["private"])
-                TRAINS[public_train_ind]["contents"].append(current_hand["private"][to_use])
+                TRAINS[public_train_ind]["contents"].append(correct_domino_order(current_hand["private"][to_use], number_to_match))
                 updated_hand["private"].pop(to_use)
-
-
-    else:
-        if len(TRAINS[private_train_ind]["contents"]):
-            # see if can play on train
-            number_to_match = TRAINS[private_train_ind]["contents"][-1][1]
-            matching = find_matching_domino_inds(current_hand, number_to_match)
-            # if double is on private train, next domino in private train hand is first choice
-            # then try domino another domino public train hand
-            if len(matching["private"]) or len(matching["public"]) or len(matching["new"]):
-                pass
-
-
-    return current_hand
+                
+    return updated_hand
 
 
 def take_turn_with_basic_strategy(player_id, current_hand, train_start_number, prob_public_train=1, prob_start_train=0):
@@ -355,7 +342,7 @@ def take_turn_with_basic_strategy(player_id, current_hand, train_start_number, p
                 if train["currently_public"] or (train["private_to"] == player_id):
                     number_to_match = train["contents"][-1][1]
                     if number_to_match in drawn:
-                        train["contents"].append(drawn)
+                        train["contents"].append(correct_domino_order(drawn, number_to_match))
                         make_train_private(player_id)
                         success = True
                         break

@@ -9,8 +9,6 @@ What advantage does basic strategy have over random?
 What's the advantage of reshuffling hand before each play?
 """
 
-import random
-
 from turns import DOMINO_POOL, draw_initial_hand, take_turn_with_basic_strategy, organize_initial_hand_simple_strategy
 
 def play_game(player_strategies, train_start_number):
@@ -21,7 +19,7 @@ def play_game(player_strategies, train_start_number):
         raise(ValueError, "Play currently only implemented for 4 players")
     if any([strategy != "basic" for strategy in player_strategies]):
         raise(ValueError, "Play currently only implemented for basic strategy")
-        # draw initial hand randomly, then organize based on simple strategy
+    # draw initial hand randomly, then organize based on simple strategy
     for player in range(num_players):
         # player_strategy = player_strategies[player]
         player_hand = draw_initial_hand(num_players)
@@ -30,12 +28,24 @@ def play_game(player_strategies, train_start_number):
     # as long as no game ending condition is met, players take turns in order
     while len(DOMINO_POOL) and (winner is None):
         for player in range(num_players):
+            if not len(DOMINO_POOL):
+                break
             player_hand = hands[player]
-            player_updated_hand = take_turn_with_basic_strategy(player, player_hand, train_start_number)
+            player_updated_hand = take_turn_with_basic_strategy(player, player_hand, train_start_number, num_players)
             if not any([len(player_updated_hand[key]) > 0 for key in player_updated_hand.keys()]):
                 winner = player
+                break
     return winner
 
 
 if __name__ == "__main__":
+
     player_strategies = ["basic", "basic", "basic", "basic"]
+    train_start_number = 3
+    # winners = []
+    # for _ in range(1000):
+    winner = play_game(player_strategies, train_start_number)
+    #     winners.append(winner)
+
+    # for player in range(len(player_strategies)):
+    #     print(str(player) + ": " + str(len([x for x in winners if x == player])))

@@ -9,43 +9,37 @@ What advantage does basic strategy have over random?
 What's the advantage of reshuffling hand before each play?
 """
 
-from turns import DOMINO_POOL, draw_initial_hand, take_turn_with_basic_strategy, organize_initial_hand_simple_strategy
+from turns import MexicanTrain
 
-def play_game(player_strategies, train_start_number):
-    hands = [] # hands ordered by players
-    num_players = len(player_strategies)
+def play_game(number_of_players, train_start_number):
+
+    game = MexicanTrain(num_players=number_of_players, train_start=train_start_number)
     winner = None
-    if num_players != 4:
-        raise(ValueError, "Play currently only implemented for 4 players")
-    if any([strategy != "basic" for strategy in player_strategies]):
-        raise(ValueError, "Play currently only implemented for basic strategy")
-    # draw initial hand randomly, then organize based on simple strategy
-    for player in range(num_players):
-        # player_strategy = player_strategies[player]
-        player_hand = draw_initial_hand(num_players)
-        player_hand = organize_initial_hand_simple_strategy(player_hand, train_start_number)
-        hands.append(player_hand)
-    # as long as no game ending condition is met, players take turns in order
-    while len(DOMINO_POOL) and (winner is None):
-        for player in range(num_players):
-            if not len(DOMINO_POOL):
-                break
-            player_hand = hands[player]
-            player_updated_hand = take_turn_with_basic_strategy(player, player_hand, train_start_number, num_players)
-            if not any([len(player_updated_hand[key]) > 0 for key in player_updated_hand.keys()]):
+
+    for player in range(number_of_players):
+        game.draw_initial_hand(player_id=player)
+        game.organize_initial_hand_simple_strategy(player_id=player)
+
+    while len(game.domino_pool) and (winner is None):
+        for player in range(number_of_players):
+            game.take_turn_with_basic_strategy(player_id=player)
+            player_hand = game.hands[player]
+            if not any([len(player_hand[key]) > 0 for key in player_hand.keys()]):
                 winner = player
+                break
+            if not(len(game.domino_pool)):
                 break
     return winner
 
 
 if __name__ == "__main__":
 
-    player_strategies = ["basic", "basic", "basic", "basic"]
+    num_players = 4
     train_start_number = 3
-    # winners = []
-    # for _ in range(1000):
-    winner = play_game(player_strategies, train_start_number)
-    #     winners.append(winner)
+    winners = []
+    for iter in range(10000):
+        winner = play_game(num_players, train_start_number)
+        winners.append(winner)
 
-    # for player in range(len(player_strategies)):
-    #     print(str(player) + ": " + str(len([x for x in winners if x == player])))
+    for player in range(num_players):
+        print(str(player) + ": " + str(len([x for x in winners if x == player])))

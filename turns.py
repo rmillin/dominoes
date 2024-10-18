@@ -478,6 +478,18 @@ class MexicanTrain():
         organized_hand["public"] = list((set(remaining_hand).difference(set(possible_train_starts))).difference(set([(train[1], train[0]) for train in possible_train_starts])))
         self.hands[player_id] = organized_hand
 
+    def randomly_assign_initial_hand(self, player_id):
+        """
+        Assign equal numbers of dominos to the three hands, chosen randomly
+        """
+        unorganized_hand = self.hands[player_id]
+        n_per_type = int(self.initial_num_dominoes/3)
+        random.shuffle(unorganized_hand)
+        organized_hand = {"private": unorganized_hand[:n_per_type],  
+                          "public": unorganized_hand[n_per_type:2*n_per_type], 
+                          "new": unorganized_hand[2*n_per_type:]}
+        self.hands[player_id] = organized_hand
+
 
 
 if __name__ == "__main__":

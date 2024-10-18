@@ -18,7 +18,8 @@ def play_game(number_of_players, train_start_number):
 
     for player in range(number_of_players):
         game.draw_initial_hand(player_id=player)
-        game.organize_initial_hand_simple_strategy(player_id=player)
+        # game.organize_initial_hand_simple_strategy(player_id=player)
+        game.randomly_assign_initial_hand(player_id=player)
 
     while len(game.domino_pool) and (winner is None):
         for player in range(number_of_players):

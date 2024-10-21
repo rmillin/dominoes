@@ -402,7 +402,6 @@ class MexicanTrain():
         current_hand is a dictionary with assigment based on intended use - 
         {"private": [], "public": [], "new": []}
         """
-        current_hand = self.hands[player_id]
         self.update_hand(player_id)
         """
         - Check for double on the board:

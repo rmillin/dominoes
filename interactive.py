@@ -134,7 +134,9 @@ def play_game(train_start_number):
             else:
                 print(candidate_dominos[0], " is the only available domino and will be added")
                 private_train["contents"].append(correct_domino_order(candidate_dominos[0], train_end))
-                game.hands[0].remove(candidate_dominos[0])
+                # handle draw or when domino comes from hand
+                if candidate_dominos[0] in game.hands[0]:
+                    game.hands[0].remove(candidate_dominos[0])
 
         elif option == "Start new public train":
             candidate_dominos = [domino for domino in available_dominos if game.train_start in domino]
@@ -170,7 +172,9 @@ def play_game(train_start_number):
             else:
                 print(candidate_dominos[0], " is the only available domino and will be added")
                 public_train["contents"].append(correct_domino_order(candidate_dominos[0], train_end))
-                game.hands[0].remove(candidate_dominos[0])
+                # handle draw or when domino comes from hand
+                if candidate_dominos[0] in game.hands[0]:
+                    game.hands[0].remove(candidate_dominos[0])
 
         else:
             raise(ValueError, "Should not end up here ever")

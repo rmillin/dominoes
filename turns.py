@@ -79,13 +79,16 @@ class MexicanTrain():
                     domino_pool.append((first_domino_val, second_domino_val))
             self.domino_pool = domino_pool
         
-        if num_players == 4:
+        if (num_players >= 4) and (num_players <= 6):
             self.initial_num_dominoes = 15
+            self.max_domino_value = 12
+        elif (num_players == 2) or (num_players == 3):
+            self.initial_num_dominoes = 8
+            self.max_domino_value = 9
         else:
-            raise(ValueError, "Currently game is only set up for 4 players")
+            raise(ValueError, "Currently game is only set up for 2 to 6 players")
 
         self.number_of_players = num_players
-        self.max_domino_value = 12
         self.number_of_possible_trains = 8
         self.train_start = train_start
         self.trains = []
